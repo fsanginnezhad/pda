@@ -1,0 +1,10 @@
+{% extends "main.html" %}
+{% block title %}صفحه در حال بروزرسانی{% endblock %}
+{% block content %}
+  {% load static %}
+  <div class="container">
+    <img src="{% static 'app/images/fix.jpg' %}" alt="در حال بروزرسانی" />
+    <h1>صفحه در حال بروزرسانی است</h1>
+    <p>لطفاً کمی صبر کنید، به زودی باز می‌گردیم.</p>
+  </div>
+{% endblock %}

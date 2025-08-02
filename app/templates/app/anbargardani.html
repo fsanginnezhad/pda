@@ -1,0 +1,237 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block title %}
+  گزارش انبار گرانی
+{% endblock %}
+{% block style %}
+  @font-face { font-family: Vazir; font-style: normal; font-weight: 400; /* src: url("fonts/Vazir-Black.eot"); */ src: url("./Vazir.ttf") format("ttf"), url("./Vazir.ttf") format("ttf"); }
+
+  body { font-family: Arial, sans-serif; direction: rtl; background-color: #f9f9f9; font-family: "Vazir", sans-serif; }
+
+  h1 { text-align: center; margin-top: 20px; color: #333; } table { width: 80%; margin: 0 auto; border-collapse: collapse; margin-top: 20px; background-color: white; } table, th, td { border: 1px solid #ddd; } th, td { padding: 12px; text-align: center; } th { background-color: #4caf50; color: white; cursor: pointer; } tr:nth-child(even) { background-color: #f2f2f2; } 
+  #export-excel {
+    background-color: #4caf50;
+    border: 1px solid gray;
+    padding: 5px;
+    color: #f2f2f2;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 5px;
+}
+  
+  .filter-container { display: flex; justify-content: space-between; margin-bottom: 20px; }
+
+  @media (min-width: 1400px) { .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl { max-width: 1550px !important; } }
+
+  .row > * { width: auto !important ; }
+
+  .bd-calendar { width: 380px !important; }
+
+  .bd-today { background-color: #d1dafb !important; }
+
+  #filter { background-color: antiquewhite !important; border: 1px solid #838383 !important; border-radius: 5px; }
+
+  h1 { margin-bottom: 40px !important; }
+  
+  #back {
+    background-color: antiquewhite !important;
+    border: 1px solid #838383 !important;
+    border-radius: 5px;
+}
+
+@media only screen and (max-width: 1370px) {
+.row{
+flex-wrap:nowrap !important;
+}
+
+@media (min-width: 1200px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl {
+        max-width: 13230px !important;
+        margin: 0 10px;
+    }
+}
+{% endblock %}
+{% block link_style %}
+  <link rel="stylesheet" href="{% static 'app/css/kamadatepicker.min.css' %}" />
+{% endblock %}
+{% block content %}
+  <h1>گزارش انبار گرانی</h1>
+  <div class="container">
+    <div class="filter-container">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                از:<input type="text" name="fromDate" id="fromDate" class="" placeholder="" />تا:
+                <input type="text" name="toDate" id="toDate" class="" placeholder="" />
+                <button id="filter" onclick="filterByDate()" type="submit">فیلتر</button>
+                <!-- دکمه فیلتر -->
+            </div>
+        </form>
+        <div>
+            <input type="text" id="codeInput" onkeyup="filterTable(1)" placeholder="فیلتر براساس کد کالا" />
+            <input type="text" id="nameInput" onkeyup="filterTable(2)" placeholder="فیلتر براساس نام کالا" />
+            <!--<input type="number" id="userInput" onkeyup="filterTable(3)" placeholder="فیلتر براساس شماره" />-->
+        </div>
+        <!--<div>-->
+        <!--    <input type="checkbox" id="showDifferences" onchange="filterDifferences()" />-->
+        <!--    <label for="showDifferences"> اختلاف</label>-->
+        <!--</div>-->
+        <div>
+            <a href="{% url 'submit_barcode' %}"><button id="back">برگشت</button></a>
+            <a id="export-excel" class="button">excel</a>
+        </div>
+    </div>
+</div>
+
+  <table id="table-anbar">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">تاریخ</th>
+        <th onclick="sortTable(1)">کد کالا</th>
+        <th onclick="sortTable(2)">نام کالا</th>
+        <th onclick="sortTable(3)">شمارش 1</th>
+        <th onclick="sortTable(4)">شمارش 2</th>
+        <th onclick="sortTable(5)">شمارش 3</th>
+        <th onclick="sortTable(6)">اختلاف 1-2</th>
+        <th onclick="sortTable(7)">اختلاف 2-3</th>
+        <th onclick="sortTable(8)">انباردار</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for prod in products %}
+        <tr>
+          <td>{{ prod.dateprod }}</td>
+          <td>{{ prod.codeKala }}</td>
+          <td>{{ prod.nameKala }}</td>
+          <td>{{ prod.count1 }}</td>
+          <td>{{ prod.count2 }}</td>
+          <td>{{ prod.count3 }}</td>
+          <td>{{ prod.differ2_1 }}</td>
+          <td>{{ prod.differ3_2 }}</td>
+          <td>{{ prod.user }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% block script_footer %}
+    <script src="{% static 'app/js/jquery.js' %}"></script>
+    <script src="{% static 'app/js/kamadatepicker.min.js' %}"></script>
+    <script>
+      let options = {
+        //twodigit: false,
+        nextButtonIcon: "{% static 'app/images/timeir_next.png' %} ",
+        previousButtonIcon: "{% static 'app/images/timeir_prev.png' %}",
+        forceFarsiDigits: true,
+        markToday: true,
+        markHolidays: true,
+        highlightSelectedDay: true,
+        gotoToday: false
+      }
+      kamaDatepicker('fromDate', options)
+    </script>
+
+    <script>
+      let option = {
+        //twodigit: false,
+        nextButtonIcon: 'static/app/images/timeir_next.png',
+        previousButtonIcon: 'static/app/images/timeir_prev.png',
+        forceFarsiDigits: true,
+        markToday: true,
+        markHolidays: true,
+        highlightSelectedDay: true,
+        gotoToday: false
+      }
+      kamaDatepicker('toDate', option)
+    </script>
+
+    <script type="text/javascript" src="{% static 'app/js/TableToExcel.js' %}"></script>
+    <script>
+      /////////////// تابع برای خروجی اکسل////////////
+      
+      $('#export-excel').click(function () {
+        // ایجاد یک جدول جدید موقت
+        var table = document.getElementById('table-anbar')
+        var newTable = document.createElement('table')
+        newTable.setAttribute('id', 'temp-table')
+      
+        // کپی کردن بخش thead (سر ستون ها)
+        var thead = table.querySelector('thead').cloneNode(true)
+        newTable.appendChild(thead)
+      
+        // کپی کردن فقط سطرهای قابل مشاهده از tbody
+        var tbody = document.createElement('tbody')
+        Array.from(table.querySelectorAll('tbody tr')).forEach(function (row) {
+          if (row.style.display !== 'none') {
+            var clonedRow = row.cloneNode(true)
+            tbody.appendChild(clonedRow)
+          }
+        })
+        newTable.appendChild(tbody)
+      
+        // افزودن جدول موقت به بدنه (بدون نمایش)
+        document.body.appendChild(newTable)
+      
+        // صدور جدول جدید به اکسل
+        TableToExcel.convert(document.getElementById('temp-table'), {
+          name: 'filtered_table.xlsx',
+          sheet: { name: 'Sheet 1' }
+        })
+      
+        // حذف جدول موقت پس از خروجی اکسل
+        document.body.removeChild(newTable)
+      })
+      
+      // تابع فیلتر کردن جدول بر اساس ورودی
+      function filterTable(columnIndex) {
+        var input, filter, table, tr, td, i, txtValue
+        input = document.getElementById(columnIndex === 1 ? 'codeInput' : columnIndex === 2 ? 'nameInput' : 'userInput')
+        filter = input.value.toLowerCase()
+        table = document.getElementById('table-anbar')
+        tr = table.getElementsByTagName('tr')
+      
+        for (i = 1; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName('td')[columnIndex]
+          if (td) {
+            txtValue = td.textContent || td.innerText
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+              tr[i].style.display = ''
+            } else {
+              tr[i].style.display = 'none'
+            }
+          }
+        }
+      }
+    </script>
+
+    <script>
+      function filterByDate() {
+        var fromDate = document.getElementById('fromDate').value
+        var toDate = document.getElementById('toDate').value
+        var table = document.getElementById('table-anbar')
+        var tr = table.getElementsByTagName('tr')
+      
+        // تبدیل تاریخ شمسی به عددی برای مقایسه
+        function persianDateToNum(date) {
+          return date.split('/').join('')
+        }
+      
+        var from = persianDateToNum(fromDate)
+        var to = persianDateToNum(toDate)
+      
+        // پیمایش سطرهای جدول
+        for (var i = 1; i < tr.length; i++) {
+          var td = tr[i].getElementsByTagName('td')[0] // ستون تاریخ
+          if (td) {
+            var date = persianDateToNum(td.textContent || td.innerText)
+            if (date >= from && date <= to) {
+              tr[i].style.display = '' // نمایش سطر
+            } else {
+              tr[i].style.display = 'none' // مخفی کردن سطر
+            }
+          }
+        }
+      }
+    </script>
+  {% endblock %}
+{% endblock %}

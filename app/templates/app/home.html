@@ -1,0 +1,291 @@
+{% extends "main.html" %}
+{% block title %}page2{% endblock %}
+{% load static %}
+{% block style %}
+
+body {
+    background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    /*display: flex;*/
+    flex-direction: column;
+    /*justify-content: center;*/
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow-y: hidden;
+}
+
+.text {
+    margin-bottom: 40px;
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container {
+    /*display: flex;*/
+    justify-content: space-between;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+button, select {
+    flex: 1;
+    padding: 15px;
+    margin: 0 5px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.image-container {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    position: relative;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+.exit-button-container {
+    width: 70%; 
+    position: sticky; 
+    bottom: 20px; 
+    left: 0; 
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.exit-button {
+    padding: 10px 20px; 
+    border: 1px solid #ccc;
+    background-color: #f44336; 
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px; 
+    width: 100%; 
+    transition: background-color 0.3s ease;
+}
+
+.exit-button:hover {
+    background-color: #d32f2f; 
+}
+
+
+.dropdown-container {
+    position: relative;
+    flex: 1;
+    margin: 0 5px;
+}
+
+.dropdown-btn {
+    padding: 15px;
+    width: 100%;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+.dropdown-btn:hover {
+    background-color: #45a049;
+}
+
+.dropdown-btn .arrow {
+    margin-left: 10px; 
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-container:hover .dropdown-content {
+    display: block;
+}
+
+
+.text.text-center {
+    font-size: medium;
+}
+
+@media (max-width: 768px) {
+    .btn-secondary {
+      width: 80% !important;
+      margin: 0 auto; 
+    }
+  }
+  
+  .row.g-3.mb-4{
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 0 10px 10px 0px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+button.btn.btn-secondary.w-100{
+    background-color: #a0a954 !important;
+    padding: 10px 10px 10px 0px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(255, 255, 255, 0.5);
+z-index: -1;
+}
+
+button.btn.btn-info.w-100 {
+    color: white;
+}
+
+{% endblock %}
+{% block content %}
+<div class="overlay"></div>
+    <div class="text"><b>
+                برای ادامه روند یک گزینه را انتخاب کنید
+    </b>
+
+    </div>
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+        <div class="row g-3 mb-4">
+            
+          <div class="col-7 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="3"
+              class="btn btn-success  w-100"
+            >
+              رسید انتقال به انبار
+            </button>
+          </div>
+          
+          <div class="col-5 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="1"
+              class="btn btn-success  w-100"
+            >
+              رسید خرید
+            </button>
+          </div>
+          
+         </div>
+         
+         <div class="row g-3 mb-4">
+          
+          <div class="col-7 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="103"
+              class="btn btn-primary w-100"
+            >
+              حواله انتقال به انبار
+            </button>
+          </div>
+          
+          <div class="col-5 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="1000"
+              class="btn btn-primary w-100"
+            >
+              حواله مستقیم
+            </button>
+          </div>
+        </div>
+        
+        <div class="row g-3 mb-4">
+
+          <div class="col-7 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="2"
+              class="btn btn-info w-100"
+            >
+             رسید برگشت از فروش
+            </button>
+          </div>
+          
+          <div class="col-5 p-2">
+            <button
+              type="submit"
+              name="type"
+              value="0"
+              class="btn btn-info w-100"
+            >
+             رسید مستقیم
+            </button>
+          </div>
+        </div>
+
+        </form>
+    </div>
+    <div class="d-grid mt-1 text-center">
+      <a href="{% url "submit_barcode" %}"><button class="btn btn-secondary w-100"> انبارگردانی و گزارشات </button></a>
+    </div>
+    <!--<div class="image-container">
+        <img src="{% static "app/images/3.jpg" %}" alt="انبار">
+    </div>-->
+    <!-- دکمه خروج -->
+    <div class="btn-group btn-group-lg mt-4">
+        <a href="{% url "logout" %}"><button class="exit-button mt-2">خروج</button></a>
+    </div>
+{% endblock %}

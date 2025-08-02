@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+{% block title %}Document{% endblock %}
+{% block style %}
+
+body {
+     background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed;
+    background-size: cover;
+    }
+    
+    .overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(255, 255, 255, 0.5);
+z-index: -1;
+}
+
+.col-12.d-flex.align-items-center {
+    margin-top: 60px;
+
+{% endblock  %}
+    
+{% block content %}
+<div class="overlay"></div>
+    <div class="container mt-5" style="direction: rtl; font-size: 15px">
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+            <div class="col-12 d-flex align-items-center">
+                <label for="RemittanceNumber" class="form-label me-2"></label>
+                <input
+                    type="text"
+                    class="form-control me-2"
+                    id="RemittanceNumber"
+                    name="RemittanceNumber"
+                    placeholder="شماره"
+                    style="font-size: 15px;max-width: 200px;"
+                />
+                <button type="submit" class="btn btn-warning" style="width: 100px; height: 40px">نمایش</button>
+            </div>
+        </form>
+        <div class="row mt-3">
+        <div class="col d-flex justify-content-end">
+        <a href="{% url "index" %}" class="ms-2"><button class="btn btn-secondary"
+              style="width: 100px; height: 40px; margin-left: 10px">برگشت</button></a>
+        <a href="{% url "logout" %}"><button class="btn btn-danger" style="width: 100px; height: 40px">خروج</button></a>
+        </div>
+      </div>
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+

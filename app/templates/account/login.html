@@ -1,0 +1,148 @@
+{% extends "main.html" %}
+{% load static %}
+{% block title %}login{% endblock %}
+
+
+{% block style %}
+   body {
+     background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 10%;
+    left: 18%;
+    transform: -50% -50%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    line-height: 28px;
+    overflow-x: hidden;
+    width: 100%;
+    }
+    
+    .signup-form {
+        width: 300px;
+        padding: 10px;
+        text-align: right;
+        background-color: white;
+        border-radius: 10px;
+    }
+    
+    .checkbox {
+        background-color: rgb(255, 255, 255);
+        text-align: right;
+        padding: 0 10px 10px;
+        width: 300px;
+        border-radius: 0 0 10px 10px;
+    }
+    
+    .signup-form input {
+        display: block;
+        width: 100%;
+        padding: 0 16px;
+        height: 34px;
+        box-sizing: border-box;
+        border: 1px solid gray;
+        border-radius: 10px;
+    }
+    
+    #submit {
+        text-align: center;
+        background-color: rgb(90, 90, 243);
+        color: white;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        margin: 10px 0 0;
+    }
+    
+    #fName {
+        text-align: right;
+    }
+    
+    #Pwd {
+        text-align: right;
+    }
+    
+    .a {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        color: rgb(77, 77, 216);
+    }
+    
+    .profile {
+        width: 290px;
+        height: 180px;
+        border-bottom: 1px solid rgb(212, 212, 212);
+    }
+    
+    .signup-form,
+    .checkbox {
+        max-width: 400px;
+        margin: auto;
+        text-align: right;
+    }
+    
+    @media (max-width: 768px) {
+        .signup-form {
+            padding: 15px;
+        }
+    
+        .checkbox {
+            padding: 10px 15px 15px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        body {
+            top: 5%;
+            margin: 10px 0 auto;
+            position: absolute;
+            left: 1%;
+            background-size: cover;
+        }
+    
+        .signup-form {
+            padding: 10px;
+        }
+    
+        .checkbox {
+            padding: 5px 10px 10px;
+        }
+    }
+    
+    a {
+        text-decoration: none;
+        color: black;
+    }
+    
+    .overlay {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     /*background: rgba(255, 255, 255, 0.5);*/
+     z-index: -1;
+}
+
+{% endblock  %}
+
+{% block content %}
+<div class="overlay"></div>
+    <div class="signup-form">
+        <img src="{% static "account/images/client.jpg" %}" alt="Profile Picture" class="profile" />
+        <form method="post">
+            {% csrf_token %}
+            <label for="fName">نام کاربری</label>
+            {{ form.username }}
+            <label for="Pwd">کلمه عبور</label>
+            {{ form.password }}
+            <input type="submit" id="submit" value="ورود به سامانه" />
+        </form>
+        <br>
+    </div>
+    
+    <!--<div class="checkbox">
+        <label for="checkbox">مرا به خاطر بسپار</label>
+        <input type="checkbox" name="checkbox" id="checkbox" />
+        <br />
+        <a href="">کلمه عبور خور را فراموش کرده اید؟</a>
+    </div>-->
+{% endblock %}

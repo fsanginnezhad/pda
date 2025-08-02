@@ -1,0 +1,258 @@
+{% extends 'main.html' %}
+{% block title %}
+    محصولات
+{% endblock %}
+{% block style %}
+    body { background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed; background-size: cover;
+    color: rgb(0, 0, 0); }
+
+    .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.5);
+    z-index: -1; }
+
+    .container { direction: rtl; margin-top: 20px; font-size: 13px; }
+
+    .rounded-4 { padding: 10px; }
+
+    .form-label { margin-left: 5px; }
+
+    .col-sm-3 { border: 1px solid gray; padding: 5px; border-radius: 5px; margin: 5px; background-color: #82a397; }
+
+    .col-sm-2 { border: 1px solid gray; padding: 3px; border-radius: 5px; margin: 2px; background-color: #82a397; }
+
+    .d-flex { flex-wrap: wrap; }
+
+    button#dropdownMenuButton { background-color: #a2a37b; color: black; }
+
+    .hidden { display: none; }
+
+    .details-box { border: 1px solid #ccc; border-radius: 5px; padding: 0 15px; margin-top: 10px; background-color:
+    rgba(255, 255, 255, 0.8); }
+
+    .error-message { color: red; margin-top: 10px; }
+
+    .button-container { margin-top: 40px; display: flex; justify-content: flex-end; gap: 10px; }
+
+    .btn-custom { padding: 10px 20px; font-size: 16px; border-radius: 5px; }
+
+    div#scan { background-color: #ffa07c; border-radius: 10px; padding: 10px 15px 0 0; }
+
+    div#number { padding-top: 10px; }
+
+    h5#product { background-color: #c9c9c9; padding: 10px 5px; border-radius: 10px; margin-top: 5px; }
+
+    .container-box { position: relative; }
+
+    .readonly-input, .focus-input { position: absolute; top: 0; left: 0; width: 100%; padding: 10px; box-sizing: border-box;
+    }
+
+    .readonly-input { background-color: white; z-index: 1; }
+
+    .focus-input { opacity: 0; z-index: 2; }
+{% endblock %}
+{% block content %}
+    <div class="overlay"></div>
+    <div class="container">
+        <form method="post" class="row g-3">
+            <!--{% csrf_token %}-->
+            <div class="col-12 d-flex border-0 align-items-center">
+                <div class="col-sm-2">
+                    <label class="form-label"><b>تاریخ :</b>{{ date_product }}</label>
+                </div>
+                <div class="col-sm-2">
+                    <label class="form-label"><b>نام سند :</b>{{ type_id }}</label>
+                </div>
+                <div class="col-sm-2">
+                    <label class="form-label"><b>صادر کننده :</b>{{ export }}</label>
+                </div>
+                <div class="col-sm-2">
+                    <label class="form-label"><b>انباردار :</b>{{ user }}</label>
+                </div>
+            </div>
+
+            <div class="col-12 mt-2">
+                <label class="form-label" style="font-size: 20px; color: black"><b>لیست اقلام :</b></label>
+            </div>
+
+            <div class="container mt-1">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">انتخاب کالا</button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for prod in products %}
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="selectItem('{{ prod.id }}', '{{ prod.code }}', '{{ prod.allow }}')">{{ prod.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% for prod in products %}
+                <div id="itemDetails_{{ prod.id }}" class="details-box hidden">
+                    <h5><b>{{ prod.name }}</b></h5>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">کد کالا: <span id="code_{{ prod.id }}">{{ prod.code }}</span></label>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">تعداد کالا: <span id="quantity_{{ prod.id }}">{{ prod.amount }}</span></label>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">اسکن شده: <span id="scanned_{{ prod.id }}">{{ prod.description }}</span></label>
+                        </div>
+                    </div>
+                    <div class="container-box">
+                        <input type="text" id="serial_{{ prod.id }}" name="serial_{{ prod.id }}" class="form-control hidden" placeholder="سریال جدید را وارد کنید" required />
+                        <input type="text" id="readonly-input" class="readonly-input form-control hidden" placeholder="سریال را با دستگاه اسکن کنید" readonly />
+                        <button id="submit_button" class="submit_button btn btn-success hidden" onclick="submitDetails(event, '{{ prod.id }}')">ثبت</button>
+                        <p id="error-message-{{ prod.id }}" class="error-message hidden"></p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="button-container mt-3">
+                <a href="{% url 'index' %}" class="btn btn-warning">برگشت</a>
+                <a href="{% url 'logout' %}" class="btn btn-danger">خروج</a>
+            </div>
+        </form>
+    </div>
+    {% block script_footer %}
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            var item_id
+            function setDropdownText(code) {
+                $('#dropdownMenuButton').text(code)
+            }
+            function selectItem(itemId, code, allow) {
+                item_id = itemId
+                $('.details-box').addClass('hidden')
+                $(`#itemDetails_${itemId}`).removeClass('hidden')
+                if (allow === 'True') {
+                    $('.submit_button').removeClass('hidden')
+                    $(`#serial_${itemId}`).addClass('hidden')
+                }
+                if (allow === 'False') {
+                    $('.submit_button').addClass('hidden')
+                    $(`#serial_${itemId}`).removeClass('hidden')
+                    $(`#serial_${itemId}`).focus()
+                }
+                setDropdownText(code)
+                const focusInput = $(`#serial_${item_id}`)
+                const errorMessage = $(`#error-message-${itemId}`)
+                setInterval(function () {
+                    focusInput.focus()
+                }, 500)
+                const scanSpeedThreshold = 100
+                let lastKeypressTime = 0
+                function clearInputs() {
+                    focusInput.val('')
+                    $('.readonly-input').val('سریال را با دستگاه اسکن کنید')
+                }
+                focusInput.on('keydown', function (e) {
+                    const currentTime = new Date().getTime()
+                    if (currentTime - lastKeypressTime > scanSpeedThreshold) {
+                        isKeyboardInput = true
+                        e.preventDefault()
+                    } else {
+                        isKeyboardInput = false
+                    }
+                    lastKeypressTime = currentTime
+                    if (e.key === 'Enter') {
+                        e.preventDefault()
+                        const inputData = focusInput.val()
+                        if (isKeyboardInput) {
+                            clearInputs()
+                            const errorMessage = $(`#error-message-${itemId}`)
+                            errorMessage.text('کیبورد مجاز نیست فقط با دستگاه اسکن کنید.').removeClass('hidden').css('color', 'red')
+                        } else {
+                            if (inputData) {
+                                sendDataToServer(inputData, item_id)
+                                clearInputs()
+                            }
+                        }
+                    }
+                })
+            }
+            function sendDataToServer(inputData, itemId) {
+                const itemCode = $(`#code_${itemId}`).text().trim()
+                const scannedAmountElement = $(`#scanned_${itemId}`)
+                const currentScanned = parseInt(scannedAmountElement.text())
+                const itemAmount = parseInt($(`#quantity_${itemId}`).text())
+                const errorMessage = $(`#error-message-${itemId}`)
+                if (typeof parseInt(inputData) === 'number' && !isNaN(inputData) && inputData) {
+                    if (currentScanned < itemAmount && currentScanned !== itemAmount) {
+                        if (parseInt(itemCode) === parseInt(inputData) && String(itemCode) === String(inputData)) {
+                            $.ajax({
+                                url: '/update-product/',
+                                method: 'POST',
+                                data: JSON.stringify({
+                                    product_id: itemId,
+                                    serial: inputData
+                                }),
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    if (response.success) {
+                                        scannedAmountElement.text(response.description)
+                                        errorMessage.text(response.message).removeClass('hidden').css('color', response.color)
+                                        $(`#serial_${itemId}`).val('')
+                                    } else {
+                                        errorMessage.text(response.error).removeClass('hidden').css('color', 'red')
+                                    }
+                                },
+                                error: function (xhr) {
+                                    errorMessage.text('خطایی در ارتباط با سرور رخ داد').removeClass('hidden').css('color', 'red')
+                                }
+                            })
+                        } else {
+                            errorMessage.text('سریال وارد شده با کد کالا مطابقت ندارد.').removeClass('hidden').css('color', 'red')
+                        }
+                    } else if (currentScanned >= itemAmount) {
+                        errorMessage.text('نمی‌توانید بیشتر از میزان موجودی اسکن کنید.').removeClass('hidden').css('color', 'red')
+                    } else {
+                        errorMessage.text('نمی‌توانید بیشتر از میزان موجودی اسکن کنید.').removeClass('hidden').css('color', 'red')
+                    }
+                } else {
+                    errorMessage.text('فقط مقادیر عددی مجاز هستند').removeClass('hidden').css('color', 'red')
+                }
+            }
+            function submitserver(itemId) {
+                const itemCode = $(`#code_${itemId}`).text().trim()
+                const scannedAmountElement = $(`#scanned_${itemId}`)
+                const currentScanned = parseInt(scannedAmountElement.text())
+                const itemAmount = parseInt($(`#quantity_${itemId}`).text())
+                const errorMessage = $(`#error-message-${itemId}`)
+                errorMessage.addClass('hidden')
+                if (currentScanned < itemAmount && currentScanned !== itemAmount) {
+                    $.ajax({
+                        url: '/update-product-auto/',
+                        method: 'POST',
+                        data: JSON.stringify({
+                            product_id: itemId,
+                            product_code: itemCode,
+                            countOfscan: itemAmount
+                        }),
+                        contentType: 'application/json',
+                        success: function (response) {
+                            if (response.success) {
+                                scannedAmountElement.text(response.description)
+                                errorMessage.text(response.message).removeClass('hidden').css('color', response.color)
+                                $(`#serial_${itemId}`).val('')
+                            } else {
+                                errorMessage.text(response.error).removeClass('hidden').css('color', 'red')
+                            }
+                        },
+                        error: function (xhr) {
+                            errorMessage.text('خطایی در ارتباط با سرور رخ داد').removeClass('hidden').css('color', 'red')
+                        }
+                    })
+                } else if (currentScanned >= itemAmount) {
+                    errorMessage.text('نمی‌توانید بیشتر از میزان موجودی اسکن کنید.').removeClass('hidden').css('color', 'red')
+                } else {
+                    errorMessage.text('نمی‌توانید بیشتر از میزان موجودی اسکن کنید.').removeClass('hidden').css('color', 'red')
+                }
+            }
+            function submitDetails(event, itemId) {
+                submitserver(itemId)
+            }
+        </script>
+    {% endblock %}
+{% endblock %}

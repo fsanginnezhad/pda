@@ -1,0 +1,256 @@
+{% extends 'main.html' %}
+{% block title %}
+  صفحه شمارش
+{% endblock %}
+
+{% block style %}
+  body { font-family: "IRANSansWeb"; direction: rtl; text-align: right; padding:40px 10px; background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed; text-align: right; }
+
+  .container { border-radius: 10px; max-width: 500px; margin: auto; }
+
+  .header-row, .serial-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+  h1 { color: black; margin: 0; flex-grow: 1; }
+
+  label { font-size: 18px; margin-left: 10px; color: black; padding-bottom: 10px; }
+
+  input[type="number"], input[type="text"] { padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 5px; }
+
+  .date-container, .serial-container { display: flex; align-items: center; gap: 10px; }
+
+  .date-input, .serial-input { width: 60%; }
+
+  .header-row h1 { margin-left: 20px; }
+
+  button { float: left; border-radius: 5px; background-color: #19b519; padding: 5px 10px; border: 1px solid #9b9b9b; margin-top: 10px; }
+
+  div#product-details { border: 1px solid #ccc; border-radius: 5px; padding: 0 15px 10px; margin-top: 10px; background-color: rgba(255, 255, 255, 0.8); }
+
+  label#product { color: black; }
+
+  p#name { background-color: #c9c9c9; padding: 10px 5px; border-radius: 10px; margin-top: 5px; }
+
+  p#mess {
+
+  margin-top: 80px; padding-right: 10px; font-size: 20px; }
+
+  .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: -1; }
+
+  .container-box { position: relative; width: 200px; }
+
+  .readonly-input, .focus-input { position: absolute; top: 0; left: 0; width: 100%; padding: 10px; box-sizing: border-box; }
+
+  .readonly-input { background-color: white; z-index: 1; }
+
+  .focus-input { opacity: 0; z-index: 2; }
+
+  .error-message { color: red; margin-top: 10px; display: none; }
+{% endblock %}
+{% block content %}
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="header-row">
+      {% if counted == 'auto1' or counted == 'manual1' %}
+        <h1 id="one"><b>شمارش اول</b></h1>
+      {% elif counted == 'auto2' or counted == 'manual2' %}
+        <h1 id="tow"><b>شمارش دوم</b></h1>
+      {% elif counted == 'auto3' or counted == 'manual3' %}
+        <h1 id="three"><b>شمارش سوم</b></h1>
+      {% endif %}
+      <div class="date-container"></div>
+    </div>
+    {% if counted == 'auto1' or counted == 'auto2' or counted == 'auto3' %}
+      {% csrf_token %}
+      <div class="serial-row container-box">
+        <label for="barcode">سریال:</label>
+        <input type="number" id="readonly-input" class="readonly-input" placeholder="سریال را با دستگاه اسکن کنید" readonly />
+        <input name="barcode" type="number" id="barcode" class="barcode" value="" />
+      </div>
+    {% endif %}
+    {% if counted == 'manual1' or counted == 'manual2' or counted == 'manual3' %}
+      <form id="product-form" method="post">
+        {% csrf_token %}
+        <label for="product_code">سریال را وارد کنید:</label>
+        <input type="text" id="product_code" name="product_code" class="serial-input" data-item-id="{{ prod.id }}" placeholder="سریال جدید را وارد کنید" />
+      </form>
+      <div id="product-details" style="display:none;">
+        <h2></h2>
+        <p id="name">
+          نام کالا: <span id="product-name"></span>
+        </p>
+        <p>
+          کد کالا: <span id="product-code"></span>
+        </p>
+        <p>
+          تعداد اسکن شده: <span id="product-scan"></span>
+        </p>
+        <label id="product" for="quantity">تعداد کالا:</label>
+        <input type="text" id="quantity" min="1" />
+      </div>
+      <button type="button" id="submit-order">ثبت تعداد کالا</button>
+    {% endif %}
+    <a href="{% url 'submit_barcode' %}"><button class="btn btn-warning btn-custom" style="margin-left: 5px;">برگشت</button></a>
+  </div>
+  <p id="mess"></p>
+  {% block script_footer %}
+    {% if counted == 'auto1' or counted == 'auto2' or counted == 'auto3' %}
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        const focusInput = $('#barcode')
+        const readonlyInput = $('#readonly-input')
+        const scanSpeedThreshold = 50
+        const csrfToken = '{{ csrf_token }}'
+        
+        let lastKeypressTime = 0
+        let isKeyboardInput = false // پرچم برای شناسایی ورودی کیبورد
+        
+        // فوکوس خودکار هر 0.5 ثانیه
+        setInterval(function () {
+          focusInput.focus()
+        }, 500)
+        
+        // رویداد فشردن کلید
+        focusInput.on('keydown', function (e) {
+          const currentTime = new Date().getTime()
+        
+          // بررسی اینکه فاصله زمانی بین دو کلید کمتر از حد آستانه باشد
+          if (currentTime - lastKeypressTime > scanSpeedThreshold) {
+            isKeyboardInput = true // ورودی کیبورد شناسایی شد
+            clearInputs()
+            e.preventDefault() // جلوگیری از ورود دستی کیبورد
+          } else {
+            isKeyboardInput = false // ورودی از اسکنر PDA
+          }
+        
+          lastKeypressTime = currentTime
+        
+          // بررسی کلید Enter
+          if (e.key === 'Enter') {
+            const inputData = focusInput.val() // دریافت مقدار اسکن‌شده
+            if (isKeyboardInput) {
+              // اگر ورودی از کیبورد باشد، ورودی را پاک کنید
+              clearInputs()
+            } else {
+              // اگر ورودی از اسکنر PDA باشد، داده را به سرور ارسال کنید
+              if (inputData) {
+                sendDataToServer(inputData) // ارسال به سرور
+              }
+            }
+          }
+        })
+        
+        // ارسال داده‌ها به سرور
+        function sendDataToServer(inputData) {
+          $.ajax({
+            url: '/submit_barcode_auto/',
+            method: 'POST',
+            data: JSON.stringify({
+              serial: inputData
+            }),
+            contentType: 'application/json',
+            headers: {
+              'X-CSRFToken': csrfToken // ارسال توکن CSRF
+            },
+            success: function (response) {
+              if (response.success) {
+                $('#mess').text(response.message).css('color', response.color)
+              } else {
+                $('#mess').text(response.error).css('color', response.color)
+              }
+            },
+            error: function (xhr) {
+              $('#mess').text('خطایی در ارتباط با سرور رخ داد').css('color', 'red')
+            }
+          })
+        }
+        // پاک کردن ورودی‌ها
+        function clearInputs() {
+          focusInput.val('')
+          readonlyInput.val('سریال را با دستگاه اسکن کنید')
+        }
+        clearInputs()
+        setInterval(function() {
+          $('#mess').text('')
+          }, 5000);
+      </script>
+    {% endif %}
+    {% if counted == 'manual1' or counted == 'manual2' or counted == 'manual3' %}
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script>
+        $(document).ready(function () {
+          function showMessage(message, color) {
+            $('#mess').text(message).css('color', color)
+          }
+          $('#product_code').keydown(function (event) {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              const productCode = $(this).val()
+              if (productCode === '') {
+                showMessage('لطفا کد کالا را وارد کنید.', 'red')
+              }
+              if (isNaN(productCode)) {
+                showMessage('کد کالا باید عددی باشد.', 'red')
+                return
+              } else {
+                $.ajax({
+                  url: '/get-product-details/',
+                  data: {
+                    product_code: productCode
+                  },
+                  dataType: 'json',
+                  success: function (data) {
+                    if (data.error) {
+                      showMessage(data.error, 'red')
+                    } else {
+                      $('#product-details').show()
+                      $('#product-name').text(data.name)
+                      $('#product-code').text(data.code)
+                      $('#product-scan').text(data.scan)
+                      showMessage('')
+                    }
+                  }
+                })
+              }
+            }
+          })
+          $('#submit-order').click(function () {
+            const productCode = $('#product_code').val()
+            const quantity = $('#quantity').val()
+            if (productCode === '') {
+              showMessage('لطفا کد کالا را وارد کنید.', 'red')
+              return
+            }
+            if (quantity === '') {
+              showMessage('لطفا تعداد را وارد کنید.', 'red')
+              return
+            }
+            if (isNaN(quantity)) {
+              showMessage('تعداد باید عددی باشد.', 'red')
+              return
+            }
+            $.ajax({
+              url: '/submit-order/',
+              method: 'POST',
+              data: {
+                product_code: productCode,
+                quantity: quantity,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              dataType: 'json',
+              success: function (data) {
+                if (data.success) {
+                  showMessage(`کالا با کد ${productCode} و تعداد ${quantity} با موفقیت ثبت شد`, 'green')
+                  $('#product-details').hide()
+                  $('#product_code').val('')
+                  $('#quantity').val('')
+                }
+              }
+            })
+          })
+        })
+      </script>
+    {% endif %}
+  {% endblock %}
+{% endblock %}

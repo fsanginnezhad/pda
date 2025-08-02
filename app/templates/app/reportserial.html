@@ -1,0 +1,319 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block title %}
+  گزارش ورود و خروج به تفکیک سریال
+{% endblock %}
+{% block style %}
+  @font-face { font-family: Vazir; font-style: normal; font-weight: 400; /* src: url("fonts/Vazir-Black.eot"); */ src: url("./Vazir.ttf") format("ttf"), url("./Vazir.ttf") format("ttf"); }
+
+  body { font-family: Vazir, sans-serif; direction: rtl; background-color: #f9f9f9; font-family: "Vazir", sans-serif; }
+
+  h1 { font-family: Vazir, sans-serif; text-align: center; margin-top: 20px; color: #333; } table { width: 80%; margin: 0 auto; border-collapse: collapse; margin-top: 20px; background-color: white; } table, th, td { border: 1px solid #ddd; } th, td { padding: 12px; text-align: center; } th { background-color: #4caf50; color: white; cursor: pointer; } tr:nth-child(even) { background-color: #f2f2f2; } 
+  
+    #export-excel {
+    background-color: #4caf50;
+    border: 1px solid gray;
+    padding: 5px;
+    color: #f2f2f2;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.red-row {
+  background-color: #ff9999 !important; 
+}
+    
+    .filter-container { display: flex; justify-content: space-between; margin-bottom: 20px; }
+
+  @media (min-width: 1400px) { .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl { max-width: 1550px !important; } }
+
+  .row > * { width: auto !important ; }
+
+  .bd-calendar { width: 380px !important; }
+
+  .bd-today { background-color: #d1dafb !important; }
+
+  #filter { background-color: antiquewhite !important; border: 1px solid #838383 !important; border-radius: 5px; margin-left: 10px; }
+  
+  #back {
+    background-color: antiquewhite !important;
+    border: 1px solid #838383 !important;
+    border-radius: 5px;
+}
+
+input#userInput {
+    text-align: right;
+}
+
+  h1 { margin-bottom: 40px !important; }
+  th#date {width: 110px;}
+  @media only screen and (max-width: 1370px) {
+.row{
+flex-wrap:nowrap !important;
+}
+
+@media (min-width: 1200px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl {
+        max-width: 13230px !important;
+        margin: 0 10px;
+    }
+}
+
+{% endblock %}
+{% block link_style %}
+  <link rel="stylesheet" href="{% static 'app/css/kamadatepicker.min.css' %}" />
+{% endblock %}
+{% block content %}
+  <h1>گزارش ورود و خروج به تفکیک سریال</h1>
+
+  <div class="container">
+    <div class="filter-container">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                از:<input type="text" name="fromDate" id="fromDate" class="" placeholder="" />تا:
+                <input type="text" name="toDate" id="toDate" class="" placeholder="" />
+                <button id="filter" onclick="filterByDate()" type="submit">فیلتر</button>
+                <!-- دکمه فیلتر -->
+            </div>
+        </form>
+        <div>
+            <input type="text" id="codeInput" onkeyup="filterTable(1)" placeholder="فیلتر براساس کد کالا" />
+            <input type="text" id="nameInput" onkeyup="filterTable(2)" placeholder="فیلتر براساس نام کالا" />
+            <input type="number" id="userInput" onkeyup="filterTable(3)" placeholder="فیلتر براساس شماره" />
+        </div>
+        <div>
+            <input type="checkbox" id="showDifferences" onchange="filterDifferences()" />
+            <label for="showDifferences"> اختلاف</label>
+        </div>
+        <div>
+            <a href="{% url 'submit_barcode' %}"><button id="back">برگشت</button></a>
+            <a id="export-excel" class="button">excel</a>
+        </div>
+    </div>
+</div>
+
+  <table id="table-anbar">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">شماره</th>
+        <th onclick="sortTable(1)">نوع سند</th>
+        <th id="date" onclick="sortTable(1)">تاریخ سند</th>
+        <th onclick="sortTable(2)">کد کالا</th>
+        <th onclick="sortTable(3)">نام کالا</th>
+        <th onclick="sortTable(4)">صادر کننده فرم</th>
+        <th onclick="sortTable(5)">انباردار</th>
+        <th onclick="sortTable(6)">تعداد کالا</th>
+        <th onclick="sortTable(6)">تاریخ تحویل</th>
+        <th onclick="sortTable(9)">ساعت تحویل</th>
+        <th onclick="sortTable(7)">مقدار اسکن شده</th>
+        <th onclick="sortTable(8)">اختلاف</th>
+        <th onclick="sortTable(10)">سریال</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for prod in products %}
+        <tr>
+          <td class="difference">{{ prod.remArr }}</td>
+          <td class="difference">{{ prod.type_id }}</td>
+          <td class="difference">{{ prod.dateProduct }}</td>
+          <td class="difference">{{ prod.code }}</td>
+          <td class="difference">{{ prod.name }}</td>
+          <td class="difference">{{ prod.export }}</td>
+          <td class="difference">{{ prod.user }}</td>
+          <td class="difference">{{ prod.amount }}</td>
+          <td class="difference">{{ prod.date }}</td>
+          <td class="difference">{{ prod.clock }}</td>
+          <td class="difference">{{ prod.des }}</td>
+          <td class="difference">{{ prod.differ }}</td>
+          <td class="difference">{{ prod.serial }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  {% block script_footer %}
+    <script src="{% static 'app/js/jquery.js' %}"></script>
+<script src="{% static 'app/js/kamadatepicker.min.js' %}"></script>
+<script>
+    let options = {
+        nextButtonIcon: "{% static 'app/images/timeir_next.png' %}",
+        previousButtonIcon: "{% static 'app/images/timeir_prev.png' %}",
+        forceFarsiDigits: true,
+        markToday: true,
+        markHolidays: true,
+        highlightSelectedDay: true,
+        gotoToday: false,
+    };
+    kamaDatepicker("fromDate", options);
+</script>
+
+<script>
+    let option = {
+        nextButtonIcon: "{% static 'app/images/timeir_next.png' %}",
+        previousButtonIcon: "{% static 'app/images/timeir_prev.png' %}",
+        forceFarsiDigits: true,
+        markToday: true,
+        markHolidays: true,
+        highlightSelectedDay: true,
+        gotoToday: false,
+    };
+    kamaDatepicker("toDate", option);
+</script>
+
+<script type="text/javascript" src="{% static 'app/js/TableToExcel.js' %}"></script>
+<script>
+    // تابع برای خروجی اکسل
+    $("#export-excel").click(function () {
+        var table = document.getElementById("table-anbar");
+        var newTable = document.createElement("table");
+        newTable.id = "temp-table";
+        
+        // کپی کردن هدرها
+        var thead = table.getElementsByTagName("thead")[0].cloneNode(true);
+        newTable.appendChild(thead);
+        
+        // کپی کردن ردیف‌های فیلتر شده
+        var tbody = document.createElement("tbody");
+        Array.from(table.getElementsByTagName("tr")).forEach(function (row) {
+            if (row.style.display !== "none") {
+                var clonedRow = row.cloneNode(true);
+                tbody.appendChild(clonedRow);
+            }
+        });
+        newTable.appendChild(tbody);
+
+        document.body.appendChild(newTable);
+
+        TableToExcel.convert(document.getElementById("temp-table"), {
+            name: "filtered_table.xlsx",
+            sheet: { name: "Sheet 1" },
+        });
+
+        document.body.removeChild(newTable);
+    });
+
+    // تابع فیلتر کردن جدول بر اساس ورودی
+    function filterTable(columnIndex) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(
+            columnIndex === 1 ? "codeInput" :
+            columnIndex === 2 ? "nameInput" :
+            "userInput"
+        );
+        filter = input.value.toLowerCase();
+        table = document.getElementById("table-anbar");
+        tr = table.getElementsByTagName("tr");
+
+        // تنظیم اندیس ستون‌ها
+        let actualColumnIndex;
+        switch (columnIndex) {
+            case 1: // کد کالا
+                actualColumnIndex = 3; // چهارمین ستون
+                break;
+            case 2: // نام کالا
+                actualColumnIndex = 4; // پنجمین ستون
+                break;
+            case 3: // شماره
+                actualColumnIndex = 0; // اولین ستون
+                break;
+        }
+
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[actualColumnIndex];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    // تابع مرتب سازی جدول
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("table-anbar");
+        switching = true;
+        dir = "asc"; 
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n - 1]; // n - 1 because rows are zero-indexed
+                y = rows[i + 1].getElementsByTagName("TD")[n - 1];
+
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+
+    // تابع برای تغییر رنگ کل ردیف
+    function colorDifference() {
+        var table = document.getElementById("table-anbar");
+        var rows = table.getElementsByTagName("tr");
+        
+        for (var i = 1; i < rows.length; i++) { // شروع از 1 برای نادیده گرفتن هدر
+            var differCell = rows[i].getElementsByTagName("TD")[11]; // ستون اختلاف
+            var differValue = parseFloat(differCell.innerText); // تبدیل به عدد
+            
+            if (differValue < 0 || differValue > 0) { // اگر کمتر یا بزرگتر از صفر باشد
+                rows[i].classList.add("red-row"); // افزودن کلاس به کل ردیف
+            }
+        }
+    }
+
+    // تابع برای فیلتر کردن ردیف‌ها بر اساس چک باکس
+    function filterDifferences() {
+        var table = document.getElementById("table-anbar");
+        var rows = table.getElementsByTagName("tr");
+        var checkbox = document.getElementById("showDifferences");
+
+        for (var i = 1; i < rows.length; i++) { // شروع از 1 برای نادیده گرفتن هدر
+            var differCell = rows[i].getElementsByTagName("TD")[9]; // ستون اختلاف
+            var differValue = parseFloat(differCell.innerText); // تبدیل به عدد
+
+            if (checkbox.checked) { // اگر چک باکس تیک خورده باشد
+                // نمایش ردیف فقط اگر اختلاف کوچکتر از صفر یا بزرگتر از صفر باشد
+                if (differValue === 0) {
+                    rows[i].style.display = "none"; // مخفی کردن ردیف
+                } else {
+                    rows[i].style.display = ""; // نمایش ردیف
+                }
+            } else {
+                rows[i].style.display = ""; // نمایش همه ردیف‌ها اگر چک باکس تیک نخورده باشد
+            }
+        }
+    }
+
+    // فراخوانی تابع بعد از بارگذاری صفحه
+    document.addEventListener("DOMContentLoaded", colorDifference);
+</script>
+  {% endblock %}
+{% endblock %}

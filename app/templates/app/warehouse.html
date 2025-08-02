@@ -1,0 +1,70 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block title %}
+  شمارش کالا در انبار
+{% endblock %}
+{% block style %}
+  body { height: 100%; margin: 0; overflow-x: hidden; overflow-y:hidden; direction: rtl; text-align: right; background: url("http://jpda.ir/static/app/images/3.jpg") no-repeat center center fixed; background-size: cover; }
+
+  .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: -1; } .container { position: relative; z-index: 1; padding-bottom: 40px; } .upper-section { display: flex; justify-content: space-around; margin-bottom: 20px; } .column { width: 45%; background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: right; } .btn-group-vertical { display: flex; flex-direction: column; } .btn-group-vertical .btn { margin-bottom: 10px; } .lower-section { /*margin-top: 30px;*/ background-color: rgba(255, 255, 255, 0.8); padding:15px 15px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: right; } .btn-group, .btn-group-vertical { display: block !important; } button.btn.btn-info { border: 2px solid gray; } div#log { background-color: #ffffff00; float: left; }
+
+  .h4, h4 { font-size: 1rem !important; margin-bottom: .8rem !important; }
+
+  button#reportserial { margin-top: 10px; }
+{% endblock %}
+{% block link_style %}
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+  <div class="overlay"></div>
+  <div class="container mt-3">
+    <!-- بخش بالایی: دستی و اتومات -->
+    <div class="upper-section">
+      <div class="column">
+        <h4><b>شمارش دستی</b></h4>
+        <div class="btn-group-vertical">
+          <form method="POST">
+            {% csrf_token %}
+            <button name="number" type="submit" value="manual1" class="btn btn-primary">شمارش 1</button>
+            <button name="number" type="submit" value="manual2" class="btn btn-primary">شمارش 2</button>
+            <button name="number" type="submit" value="manual3" class="btn btn-primary">شمارش 3</button>
+          </form>
+        </div>
+      </div>
+      <div class="column">
+        <h4><b>اسکن اتومات</b></h4>
+        <div class="btn-group-vertical">
+          <form method="POST">
+            {% csrf_token %}
+            <button name="number" type="submit" value="auto1" class="btn btn-secondary">شمارش 1</button>
+            <button name="number" type="submit" value="auto2" class="btn btn-secondary">شمارش 2</button>
+            <button name="number" type="submit" value="auto3" class="btn btn-secondary">شمارش 3</button>
+          </form>
+        </div>
+        {% if test %}{{ test }}{% endif %}
+      </div>
+    </div>
+    <!-- بخش پایینی: گزارشات -->
+    <div class="lower-section">
+      <h4><b>گزارشات</b></h4>
+      <div class="btn-group btn-group-lg" role="group" aria-label="Report Buttons">
+        <a href="{% url 'warehouse' %}"><button type="button" class="btn btn-info">انبارگردانی</button></a>
+
+        <!-- serial گزارش ورود و خروج سریال -->
+        <a href="{% url 'serial' %}"><button type="button" class="btn btn-info">ورود و خروج کالا ها</button></a>
+        <!-- reportserial گزارش ورود و خروج به تفکیک سریال -->
+
+        <a href="{% url 'reportserial' %}"><button id="reportserial" type="button" class="btn btn-info">گزارش ورود و خروج به تفکیک سریال</button></a>
+      </div>
+    </div>
+  </div>
+  <div class="lower-section" id="log">
+    <div class="btn-group btn-group-lg" role="group" aria-label="Report Buttons">
+      <a href="{% url 'index' %}"><button type="button" class="btn btn-info" id="back" style="background-color: #537e6c;">برگشت</button></a>
+      <a href="{% url 'logout' %}"><button type="button" class="btn btn-info" id="logout" style="background-color: brown;">خروج</button></a>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
