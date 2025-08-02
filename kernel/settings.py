@@ -26,7 +26,6 @@ SECRET_KEY = 'django-insecure-)@jg$@&aa8ydnw5v_p!+qm8h8f_p4#drv%0xkw+lp1375n_#a^
 DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = ['jpda.ir']
 ALLOWED_HOSTS = ['*']
 
 
@@ -94,9 +93,9 @@ WSGI_APPLICATION = 'kernel.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'jpdair11_rtejarat',
-#         'USER': 'jpdair11_jpdair11',
-#         'PASSWORD': 'B4F1Py3q*yB4',
+#         'NAME': '',
+#         'USER': '',
+#         'PASSWORD': '',
 #         'HOST': 'localhost',
 #         'PORT': '3306'
 #     }}
