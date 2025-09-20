@@ -9,7 +9,8 @@ export default function Product() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    axios.get("/api/products/").then((res) => {
+    // axios.get("/api/products/").then((res) => {
+    axios.get("/?remittanceArrived=0987&typeID=1000").then((res) => {
       setProducts(res.data);
     });
   }, []);

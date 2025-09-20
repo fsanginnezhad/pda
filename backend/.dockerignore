@@ -1,0 +1,41 @@
+# فایل‌های سیستم و IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# فایل‌های پایتون
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# فایل‌های محیط مجازی
+venv/
+env/
+.venv/
+
+# فایل‌های لاگ
+*.log
+
+# فایل‌های دیتابیس
+*.sqlite3
+*.db
+
+# فایل‌های حساس
+.env
+*.env
+secrets.json
+
+# فایل‌های استاتیک جمع‌آوری شده
+staticfiles/
+
+# فایل‌های رسانه
+media/
+uploads/
+
+# تست‌ها و نمونه‌ها
+tests/
+examples/

@@ -1,0 +1,36 @@
+# فایل‌های سیستم و IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# فایل‌های node_modules
+node_modules/
+
+# فایل‌های build
+build/
+dist/
+
+# فایل‌های cache
+.npm
+.eslintcache
+
+# فایل‌های محیط
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# فایل‌های لاگ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# تست‌ها
+coverage/
+.nyc_output/
+
+# تنظیمات شخصی
+*.local
