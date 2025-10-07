@@ -30,7 +30,6 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")  # noqa
 DEBUG = os.getenv("DEBUG", "False") == "True"
 # DEBUG = True
 
-# ALLOWED_HOSTS = ['jpda.ir']
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 
