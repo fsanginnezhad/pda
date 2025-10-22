@@ -68,8 +68,6 @@ MIDDLEWARE = [
 #     "http://127.0.0.1:3000",
 #     "http://localhost:80",
 #     "http://frontend:80",
-#     "http://jpda.ir",
-#     "https://jpda.ir",
 # ]
 
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOW_ORIGINS", 'http://127.0.0.1:3000').split(",") # noqa
